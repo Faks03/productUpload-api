@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="styles.css">
+  <title>Login Form</title>
+</head>
+
+<body>
+  <div class="main">
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </nav>
+    <div class="form-container">
+      <div class="head">
+        <div>
+          <h1>Untitled</h1>
+          <!-- <span></span> -->
+        </div>
+
+      </div>
+      <form name="login" id="login"  >
+        <div class="input_container">
+          <div class="name_container">
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="email"/>
+          </div>
+        </div>
+
+        <br><br><br>
+
+        <div class="input_container">
+          <div class="name_container">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password"/>
+          </div>
+        </div>
+        <br><br><br><br><br>
+        <input class="btn" type="submit" value="Submit" />
+      </form>
+      <div id="response"></div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+        const token = localStorage.removeItem('token');
+        if (token) {
+          document.getElementById("response").innerText = `Token exists: ${token}`;
+        } else {
+          document.getElementById("response").innerText = "Token does not exist";
+        }
+    };
+    document.getElementById("login").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        if (!email || !password) {
+            document.getElementById("response").innerText = "Please provide both email and password.";
+            return;
+        }
+
+        const formData = {
+            email: email,
+            password: password
+        };
+
+        const response = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        if (response.ok) {
+            localStorage.setItem('token', responseData.token);
+            document.getElementById("response").innerText = `Logged in as: ${responseData.user.name} ${responseData.token}`;
+            // Redirect to product.html after successful login
+            setTimeout(function() {
+                    window.location.href = 'product.html';
+            }, 2000);
+        } else {
+            document.getElementById("response").innerText = `Error: ${responseData.message}
+            User does not exist. Please register.`;
+        }
+    });
+</script>
+
+</body>
+
+</html>

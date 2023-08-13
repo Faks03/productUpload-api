@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/styles.css">
+    <title>Data</title>
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            margin: auto;
+            display: block;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <nav>
+            <ul>
+                <li><a href="#" id="logout">Out</a></li>
+                <li><a href="/product.html">Form</a></li>
+            </ul>
+        </nav>
+        <div class="form-container data-container">
+            <form action="" method="GET" class="search-form" id="searchForm">
+                <input class="search" type="text" name="search" placeholder="Search..." id="searchInput">
+                <input class="btn search-btn" type="submit" value="Go">
+                <input class="btn search-btn" type="submit" value="Home" id="homeButton">
+            </form>
+            <table class="data-table" id="dataTable">
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Image</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <% products.forEach(function(product) { %>
+                <tr>
+                    <td><%= product.title %></td>
+                    <td><%= product.description %></td>
+                    <td><%= product.price %></td>
+                    <td><%= product.stock %></td>
+                    <td>
+                        <img class="product-image preview-image" src="<%= product.image %>" alt="Product Image"
+                            height="80" width="110">
+                    </td>
+
+                    <td><button class="edit" data-id="<%= product._id %>" id="<%= product.title %>">Edit</button></td>
+                    <td><button class="delete" data-id="<%= product._id %>">Delete</button></td>
+                </tr>
+                <% }) %>
+
+
+            </table>
+
+            <div id="edit-form" style="display: none;">
+                <h2 id="header"></h2>
+                <form id="product-edit-form">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required><br>
+
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description" required><br>
+
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" step="0.01" required><br>
+
+                    <label for="stock">Stock:</label>
+                    <input type="number" id="stock" name="stock" step="0.01" required><br>
+
+                    <button type="button" id="submit-button">Update</button>
+                </form>
+            </div>
+
+            <div id="imageModal" class="modal">
+                <span class="close">&times;</span>
+                <img class="modal-content" id="modalImage">
+            </div>
+
+            <div id="message"></div>
+
+            <script>
+                const logoutLink = document.getElementById('logout');
+
+                // Add a click event listener to the logout link
+                logoutLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent the default link behavior
+
+                    // Remove the token from local storage
+                    localStorage.removeItem('token');
+
+                    // Redirect the user to the home page
+                    window.location.href = '/';
+                });
+
+                // Get a reference to the home button element
+                const homeButton = document.getElementById('homeButton');
+
+                // Add a click event listener to the home button
+                homeButton.addEventListener('click', () => {
+                    location.reload(); // Reload the page
+                });
+
+                const previewImages = document.querySelectorAll('.preview-image');
+                const imageModal = document.getElementById('imageModal');
+                const modalImage = document.getElementById('modalImage');
+                const closeModalButton = document.querySelector('.close');
+
+                previewImages.forEach(image => {
+                    image.addEventListener('click', () => {
+                        modalImage.src = image.src;
+                        imageModal.style.display = 'block';
+                    });
+                });
+
+                closeModalButton.addEventListener('click', () => {
+                    imageModal.style.display = 'none';
+                });
+
+                const searchForm = document.getElementById('searchForm');
+                const dataTable = document.getElementById('dataTable');
+
+                // Handle form submit
+                searchForm.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent the form from submitting normally
+
+                    const searchInput = document.getElementById('searchInput').value;
+                    const tableRows = dataTable.getElementsByTagName('tr');
+
+                    // Loop through the table rows and hide/show them based on the search input
+                    for (let i = 1; i < tableRows.length; i++) { // Start from index 1 to skip the header row
+                        const title = tableRows[i].getElementsByTagName('td')[0].innerText.toLowerCase();
+                        const description = tableRows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+
+                        // Check if the search input matches the title or description
+                        if (title.includes(searchInput.toLowerCase()) || description.includes(searchInput
+                                .toLowerCase())) {
+                            tableRows[i].style.display = ''; // Show the row
+                        } else {
+                            tableRows[i].style.display = 'none'; // Hide the row
+                        }
+                    }
+                });
+
+                const editButtons = document.querySelectorAll('.edit');
+                const deleteButtons = document.querySelectorAll('.delete');
+                const formDiv = document.getElementById('edit-form');
+                const messageDiv = document.getElementById('message');
+                const headerDiv = document.getElementById('header');
+                // Handle edit button clicks
+
+                editButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+
+                        const productId = button.dataset.id;
+                        const productTitle = button.id;
+
+                        const confirmation = confirm('Are you sure you want to edit this product?');
+
+                        if (!confirmation) {
+                            return; // Exit if user cancels the edit
+                        }
+
+                        // Search for the clicked product title
+                        const searchInput = document.getElementById('searchInput');
+                        searchInput.value = productTitle; // Set the search input value
+
+                        // Trigger a search event programmatically
+                        const searchEvent = new Event('submit');
+                        searchForm.dispatchEvent(searchEvent);
+                        // Show the form
+                        headerDiv.innerHTML = `Edit Product (Title: ${productTitle})`
+                        formDiv.style.display = 'block';
+                        messageDiv.innerHTML = '';
+
+
+                        // Assuming your form has input fields with IDs like 'name', 'price', etc.
+                        const titleInput = document.getElementById('title');
+                        const descriptionInput = document.getElementById('description');
+                        const priceInput = document.getElementById('price');
+                        const stockInput = document.getElementById('stock');
+                        // Add more input elements as needed
+
+                        // Assuming your form also has a submit button with ID 'submit-button'
+                        const submitButton = document.getElementById('submit-button');
+
+                        submitButton.addEventListener('click', () => {
+                                const updatedProductData = {
+                                    title: titleInput.value,
+                                    description: descriptionInput.value,
+                                    stock: parseFloat(stockInput
+                                        .value),
+                                    price: parseFloat(priceInput
+                                        .value), // Convert to a number if needed
+                                    // Add more properties as needed
+                                };
+
+                                fetch(`/api/v1/products/${productId}`, {
+                                        method: 'PATCH', // Use the appropriate HTTP method for editing (PUT or PATCH)
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(updatedProductData)
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            messageDiv.textContent =
+                                                'Product updated successfully';
+                                            window.location.reload()
+                                        } else {
+                                            messageDiv.textContent = 'Failed to update product';
+                                        }
+                                    })
+                            })
+                            .catch(error => {
+                                messageDiv.textContent = 'Error while updating product';
+                            });
+
+                        // Hide the form after submission
+                        formDiv.style.display = 'none';
+                    });
+
+                });
+                // Handle delete button clicks
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const productId = button.dataset.id;
+                        const confirmation = confirm(
+                            'Are you sure you want to delete this product?');
+
+                        if (confirmation) {
+                            fetch(`/api/v1/products/${productId}`, {
+                                    method: 'DELETE'
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        // Handle success or do something after successful deletion
+
+                                        console.log('Product deleted successfully');
+                                        window.location.reload();
+                                    } else {
+                                        // Handle errors or do something if deletion fails
+                                        console.error('Failed to delete product');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error while deleting product:',
+                                        error);
+                                });
+                        }
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

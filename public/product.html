@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="styles.css">
+  <title>Product Page</title>
+</head>
+
+<body>
+  <div class="main">
+    <nav>
+      <ul>
+        <li><a href="api/v1/products">Data</a></li>
+        <li><a href="index.html">Out</a></li>
+      </ul>
+    </nav>
+    <div class="form-container">
+      <div class="head">
+        <div>
+          <h1>Product Form</h1>
+          <span>Fill appropriately</span>
+        </div>
+
+      </div>
+      <form class="form productForm" id="productForm" name="productForm" >
+        <div class="input_container">
+          <div class="name_container">
+            <label for="title">Title:</label>
+            <input type="text" name="title" id="title" />
+          </div>
+        </div>
+        <div class="message_container">
+          <label for="descirption">Description:</label>
+          <textarea class="message" name="description" id="description"></textarea>
+        </div>
+
+        <div class="input_container">
+          <div class="phone_container">
+            <label for="price">Price:</label>
+            <input type="number" name="price" id="price" />
+          </div>
+          <div class="phone_container">
+            <label for="stock">Stock:</label>
+            <input type="number" name="stock" id="stock" />
+          </div>
+        </div>
+        <label for="image">Image:</label>
+        <input type="file" name="image" id="image" accept="image/*" />
+        <br />
+        <img id="preview" src="#" alt="Preview Image" style="display: none; max-width: 50px; max-height: 50px;" />
+        <input class="btn" type="submit" value="Upload Product" />
+        <div id="messageDiv" style="display: none;"></div>
+    </div>
+
+  </div>
+  
+  </form>
+  
+  </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js" integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="./browser.js"></script>
+</body>
+
+</html>
