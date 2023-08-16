@@ -1,4 +1,24 @@
-document.addEventListener("DOMContentLoaded", () => {
+window.onload = function() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/index.html';
+    alert('You are not logged in.')
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => {  
+  const logoutLink = document.getElementById('logOut');
+
+  // Add a click event listener to the logout link
+  logoutLink.addEventListener('click', (event) => {
+      event.preventDefault(); // Prevent the default link behavior
+
+      // Remove the token from local storage
+      localStorage.removeItem('token');
+
+      // Redirect the user to the home page
+      window.location.href = '/';
+  });
   const url = 'http://localhost:3000/api/v1/products';
   const fileFormDOM = document.querySelector('.productForm');
   const titleInputDOM = document.querySelector('#title');
@@ -17,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await axios.post(`${url}/uploads/local`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
       return response.data.image.src;
@@ -34,7 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await axios.post(`${url}/uploads`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
       return response.data.image.src;

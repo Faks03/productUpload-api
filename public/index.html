@@ -48,11 +48,11 @@
   <script>
     window.onload = function() {
         const token = localStorage.removeItem('token');
-        if (token) {
-          document.getElementById("response").innerText = `Token exists: ${token}`;
-        } else {
-          document.getElementById("response").innerText = "Token does not exist";
-        }
+        // if (token) {
+        //   document.getElementById("response").innerText = `Token exists: ${token}`;
+        // } else {
+        //   document.getElementById("response").innerText = "Token does not exist";
+        // }
     };
     document.getElementById("login").addEventListener("submit", async function(event) {
         event.preventDefault();
@@ -83,14 +83,13 @@
 
         if (response.ok) {
             localStorage.setItem('token', responseData.token);
-            document.getElementById("response").innerText = `Logged in as: ${responseData.user.name} ${responseData.token}`;
+            document.getElementById("response").innerText = `Logged in as: ${responseData.user.name}`;
             // Redirect to product.html after successful login
             setTimeout(function() {
                     window.location.href = 'product.html';
             }, 2000);
         } else {
-            document.getElementById("response").innerText = `Error: ${responseData.message}
-            User does not exist. Please register.`;
+            document.getElementById("response").innerText = `User does not exist. Please register.`;
         }
     });
 </script>

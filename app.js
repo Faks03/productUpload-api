@@ -6,7 +6,7 @@ const connectDB = require('./db/connect');
 const cors = require('cors');
 const ejs = require('ejs')
 const path = require('path');
-// const authUser = require('./middleware/authentication');
+const authUser = require('./middleware/authentication');
 
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
@@ -19,6 +19,7 @@ cloudinary.config({
 //routes path
 const authRoute = require('./routes/auth');
 const productRoute = require('./routes/products');
+const viewRoute = require('./routes/view');
 
 // error handler
 const notFoundMiddleware = require('./middleware/not-found');
@@ -34,13 +35,11 @@ app.use(fileUpload({ useTempFiles: true }));
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-// app.use('/uploads', express.static('./public/uploads'));
-
 // routes
-// app.use('/api/v1/products', authUser ,productRoute);
-app.use('/api/v1/products', productRoute);
+app.use('/api/v1/products', authUser ,productRoute);
+// app.use('/api/v1/products', productRoute);
 app.use('/api/v1/auth', authRoute);
+app.use('/api/v1/view', viewRoute);
 
 // middleware
 app.use(notFoundMiddleware);
